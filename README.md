@@ -1,2 +1,1 @@
 # SerializeJava
-tool
