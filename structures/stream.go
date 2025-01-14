@@ -12,14 +12,16 @@ type Stream struct {
 	STREAM_VERSION []byte
 	Contents       []*Content
 	SerVersionUIDs []SerVersionUID
+	Num_TC_RESET   int
 }
 
-func NewStream(Contents []*Content, SerVersionUIDs []SerVersionUID) *Stream {
+func NewStream(Contents []*Content, SerVersionUIDs []SerVersionUID, num int) *Stream {
 	return &Stream{
 		STREAM_MAGIC:   STREAM_MAGIC,
 		STREAM_VERSION: STREAM_VERSION,
 		Contents:       Contents,
 		SerVersionUIDs: SerVersionUIDs,
+		Num_TC_RESET:   num,
 	}
 }
 
@@ -56,12 +58,22 @@ func ParseStream(parser *StructuresParser) (*Stream, error) {
 		return nil, err
 	}
 	contents := new([]*Content)
+	num_TC_Reset := 0
 	for {
-
+		signByte, _ := parser.ByteReader.PeekByte()
+		if signByte == TC_RESET {
+			parser.ByteReader.ReadByte()
+			num_TC_Reset += 1
+		}
+		if signByte != TC_RESET {
+			break
+		}
+	}
+	for {
 		content, err := ParseContent(parser)
 		if err != nil {
 			if err == io.EOF {
-				return NewStream(*contents, parser.SerVersionUIDs), nil
+				return NewStream(*contents, parser.SerVersionUIDs, num_TC_Reset), nil
 			}
 			return nil, err
 		}
@@ -85,7 +97,14 @@ func (stream *Stream) ToString(indent int) (string, error) {
 	result := sb.Buildf("- MAGIC:  ", []interface{}{stream.STREAM_MAGIC})
 	result += sb.Buildf("- VERSION:  ", []interface{}{stream.STREAM_VERSION})
 	result += sb.Build(" @Contents:")
+	if stream.Num_TC_RESET != 0 {
+		result += sb.BuildWithSpaces(fmt.Sprintf("@Content[0] - @Content[%v]  <TC_RESET>", stream.Num_TC_RESET), IndentSpaceCount)
+		result += sb.BuildWithSpaces(fmt.Sprintf("- TC_RESET  %v", []interface{}{TC_RESET}), IndentSpaceCount*2)
+	}
 	if len(stream.Contents) == 1 {
+		if stream.Num_TC_RESET != 0 {
+			result += sb.BuildWithSpaces(fmt.Sprintf("@Content[%v]", stream.Num_TC_RESET+1), IndentSpaceCount)
+		}
 		str, err := stream.Contents[0].ToString(IndentSpaceCount)
 		if err != nil {
 			return "", err
@@ -93,7 +112,7 @@ func (stream *Stream) ToString(indent int) (string, error) {
 		result += str
 	} else {
 		for i := 0; i < len(stream.Contents); i++ {
-			sb.BuildWithSpaces(fmt.Sprintf("@Contents[%v]", i), IndentSpaceCount)
+			result += sb.BuildWithSpaces(fmt.Sprintf("@Content[%v]", i+stream.Num_TC_RESET), IndentSpaceCount)
 			str, err := stream.Contents[i].ToString(IndentSpaceCount)
 			if err != nil {
 				return "", err

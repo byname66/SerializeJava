@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"main/common"
-	"strings"
+	//	"strings"
 )
 
 type NewArray struct {
@@ -66,9 +66,9 @@ func ParseNewArray(parser *StructuresParser) (*NewArray, error) {
 	} else if classDesc.Flag == TC_PROXYCLASSDESC || classDesc.Flag == TC_NULL {
 		return nil, fmt.Errorf("not allow TC_NULL or TC_PROXYCLASSDESC")
 	}
-	if !strings.HasPrefix(name, "[") || len(name) < 2 {
-		return nil, fmt.Errorf("JAVA_TC_ARRAY ClassName %v", name)
-	}
+	// if !strings.HasPrefix(name, "[") || len(name) < 2 {
+	// 	return nil, fmt.Errorf("JAVA_TC_ARRAY ClassName %v", name)
+	// }
 	type_code := name[1:2]
 	for i := 0; i < int(size); i++ {
 		value, err := ParseValue(parser, type_code)
