@@ -277,7 +277,7 @@ func NewFuncContainer(state *AppState) *fyne.Container {
 		outputEntry.SetText(res)
 	})
 	copyButton := widget.NewButton("Copy", func() {
-		state.MyWindow.Clipboard().SetContent(outputEntry.Text)
+		state.MyWindow.Clipboard().SetContent(strings.ReplaceAll(outputEntry.Text, "\n", ""))
 	})
 	return container.NewVBox(line, funcDirtyTheme, funcDirtyIntroduce1, funcDirtyIntroduce2, funcDirtyCheck, container.NewHBox(funcDirtyInputLabel, empty, funcDirtyInputEntry), line1, funcUtfTheme, funcUtfIntroduce1, funcUtfIntroduce2, funcUtfCheck, funcUtfLabel, container.NewHBox(empty, radio), line2, funcUidTheme, funcUidIntroduce1, funcUidIntroduce2, funcUidCheck, scrollContainer, line3, changeButton, outputContainer, copyButton)
 }
