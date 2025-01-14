@@ -124,7 +124,7 @@ func (na *NewArray) ToString(indent int) (string, error) {
 	result += sb.Build(" @Values")
 	indent += IndexToArraySpaceCount
 	for i := 0; i < len(na.Values); i++ {
-		result += sb.Buildf("Index  [", []interface{}{i, "]"})
+		result += sb.BuildfNoNewline("Index  [", []interface{}{i, "]"})
 		str, err = na.Values[i].ToString(indent)
 		if err != nil {
 			return "", fmt.Errorf("in NewArray#ToString\n%v", err)

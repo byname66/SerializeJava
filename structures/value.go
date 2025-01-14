@@ -123,10 +123,10 @@ func (v *Value) ToString(indent int) (string, error) {
 		err    error
 	)
 	sb := common.NewStringBuilder(&indent)
-	result += sb.Build(" @Value")
-	indent += IndentSpaceCount
 	switch v.TypeCode {
 	case "[", "L":
+		result += sb.Build(" @Value")
+		indent += IndentSpaceCount
 		str, err = v.Object.ToString(indent)
 		if err != nil {
 			return "", fmt.Errorf("in Value#ToString:\n %v", err)
