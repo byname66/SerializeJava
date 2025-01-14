@@ -86,8 +86,10 @@ func NewContainer(state *AppState) *fyne.Container {
 func NewStruContainer(state *AppState) *fyne.Container {
 
 	richText := widget.NewRichText()
-
+	label := widget.NewLabel("")
 	scrollContainer := container.NewScroll(richText)
+	//scrollContainer := container.NewScroll(label)
+
 	scrollContainer.SetMinSize(fyne.NewSize(600, 700))
 
 	showButton := widget.NewButton("Show the Stream Structure", func() {
@@ -98,6 +100,8 @@ func NewStruContainer(state *AppState) *fyne.Container {
 			return
 		}
 		domain() //func domain() use global variable "userinput" and change global variable "result".
+		// label.Text = result
+		// label.Refresh()
 		richText.Segments = []widget.RichTextSegment{
 			&widget.TextSegment{Text: result},
 		}
@@ -105,7 +109,7 @@ func NewStruContainer(state *AppState) *fyne.Container {
 	})
 
 	copyButton := widget.NewButton("Copy", func() {
-		state.MyWindow.Clipboard().SetContent(richText.String())
+		state.MyWindow.Clipboard().SetContent(label.Text)
 		dialog.ShowInformation("Success", "Copied to clipboard!", state.MyWindow)
 	})
 
